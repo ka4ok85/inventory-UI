@@ -27,8 +27,8 @@ app.config(function($routeProvider){
             templateUrl: function(params){ return '/ui/restatement_jobs?'+dummyParam()},
             controller:  'ListCtrl'
         })
-        .when('/planet/:planet_id',{
-            templateUrl: function(params){ return '/ui/readplanet?id='+params.planet_id+'&'+dummyParam(); },
+        .when('/restatement_job/:restatement_job',{
+            templateUrl: function(params){ return '/ui/restatement_job/'+params.restatement_job+'?'+dummyParam(); },
             controller:  'ReadCtrl'
         })
         .when('/addplanet/:dval?', {
@@ -40,34 +40,34 @@ app.config(function($routeProvider){
 app.controller('ListCtrl', function($scope, $http, $location) {
     $http.defaults.headers.post["Content-Type"] = "application/json";
 
-    $scope.viewPlanet = function(ident){
-        $location.path("/planet/"+ident);
+    $scope.viewJob = function(ident){
+        $location.path("/restatement_job/"+ident);
     }
 
-    $scope.deletePlanet = function(ident){
-        $http.delete("/planets/"+ident).
+    $scope.deleteJob = function(ident){
+        $http.delete("/jobs/"+ident).
             success(function (data){
                 $location.path("/"+dValue())
             });
     }
 
-    $scope.addPlanet = function(){
-        $location.path("/addplanet/"+dValue());
+    $scope.addJob = function(){
+        $location.path("/addjob/"+dValue());
     }
 
 });
 
 app.controller('ReadCtrl', function($scope, $http, $location, Restangular) {
 
-    $scope.planetData = {};
+    $scope.jobData = {};
 
     $scope.listView = function(){
         $location.path("/");
     }
 
     $scope.processUpdateForm = function(){
-        var pData = $scope.planetData;
-        Restangular.one("planets").customPUT(pData, pData.id).then(function(planet){
+        var pData = $scope.jobData;
+        Restangular.one("jobs").customPUT(pData, pData.id).then(function(job){
             // updated
         });
     }

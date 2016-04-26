@@ -16,7 +16,10 @@ public class Restatementjob {
 	private String product;
 
 	@JsonProperty
-	private String store;
+	private String storeName;
+
+	@JsonProperty
+	private String storeId;
 
 	@JsonProperty
 	private String storelocation;
@@ -46,12 +49,20 @@ public class Restatementjob {
 		this.product = product;
 	}
 
-	public String getStore() {
-		return store;
+	public String getStoreId() {
+		return storeId;
 	}
 
-	public void setStore(String store) {
-		this.store = store;
+	public void setStoreId(String storeId) {
+		this.storeId = storeId;
+	}
+
+	public String getStoreName() {
+		return storeName;
+	}
+
+	public void setStoreName(String storeName) {
+		this.storeName = storeName;
 	}
 
 	public String getStorelocation() {
@@ -88,7 +99,7 @@ public class Restatementjob {
 
 	@Override
 	public String toString() {
-		return "Restatementjob [id=" + id + ", product=" + product + ", store=" + store + ", storelocation="
+		return "Restatementjob [id=" + id + ", product=" + product + ", storeId=" + storeId + ", storeName=" + storeName + ", storelocation="
 				+ storelocation + ", expectedQuantity=" + expectedQuantity + ", status=" + status + ", username="
 				+ username + "]";
 	}

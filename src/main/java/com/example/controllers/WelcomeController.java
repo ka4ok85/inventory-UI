@@ -14,8 +14,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,41 +45,56 @@ public class WelcomeController {
 
     @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
     public String restatementjobsList(Model model) {
-
-    	//Iterable<Planet> planets = planetRepository.findAll();
-        //model.addAttribute("planets", planets);
-
-    	//ArrayList<> planets = new ArrayList<>()
-    	
-    	
-    	RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
 
         List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
         supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
         supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-        
+
         for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
                 jsonConverter.setObjectMapper(new ObjectMapper());
                 jsonConverter.setSupportedMediaTypes(
-                		supportedMediaTypes
+                    supportedMediaTypes
                 );
             }
         }
-String url = "http://localhost:8080/api/getAllRestatementJobs";
-Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
 
-/*
-        ResponseEntity<Restatementjobs> responseEntity = restTemplate.getForEntity(url, Restatementjobs.class);
-        Restatementjobs body = responseEntity.getBody();
-    	System.out.println(body);
-*/
-    	
-    	model.addAttribute("jobs", body);
+        String url = "http://localhost:8080/api/getAllRestatementJobs";
+        Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
+        model.addAttribute("jobs", body);
+
         return "restatementjoblist";
     }
 
 
+    @RequestMapping(value = "/ui/restatement_job/{id}", method = RequestMethod.GET, produces = "application/json")
+    public String readPlanet(@PathVariable("id") Long id, Model model)
+    {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.setObjectMapper(new ObjectMapper());
+                jsonConverter.setSupportedMediaTypes(
+                    supportedMediaTypes
+                );
+            }
+        }
+
+        String url = "http://localhost:8080/api/getRestatementJob/" + id;
+        Restatementjob body  = restTemplate.getForObject(url, Restatementjob.class);
+        model.addAttribute("job", body);
+
+        return "viewjob";
+
+    }
 }

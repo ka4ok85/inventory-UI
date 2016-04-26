@@ -2,13 +2,14 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <h2>Restatement Jobs</h2>
-            <a ng-click="addPlanet()">Add Restatement Job</a>
+            <a ng-click="addJob()">Add Restatement Job</a>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Store</th>
                         <th>Expected Quantity</th>
+                        <th>User</th>
                         <th>Status</th>
                         <th></th>
                         <th></th>
@@ -17,14 +18,15 @@
                 <tbody>
                     <tr th:each="job : ${jobs}">
                         <td th:text="${job.getId()}" />
-                        <td th:text="${job.getStore()}" />
+                        <td th:text="${job.getStoreName()}" />
                         <td th:text="${job.getExpectedQuantity()}" />
+                        <td th:text="${job.getUsername()}" />
                         <td th:text="${job.getStatus()}" />
                         <td>
-                            <a th:attr="ng-click='viewPlanet(\''+${job.getId()} + '\')'">View</a>
+                            <a th:attr="ng-click='viewJob(\''+${job.getId()} + '\')'">View</a>
                         </td>
                         <td>
-                            <a th:attr="ng-click='editPlanet(\''+${job.id} + '\')'">Edit</a>
+                            <a th:attr="ng-click='editJob(\''+${job.id} + '\')'">Edit</a>
                         </td>
                     </tr>
                 </tbody>

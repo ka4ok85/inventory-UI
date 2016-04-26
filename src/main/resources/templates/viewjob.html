@@ -1,0 +1,22 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <a ng-click="listView()">All Restatement Jobs</a>
+            <h2>Planet View</h2>
+            <form ng-submit="processUpdateForm()">
+                <div class="form-group">
+                    <input type="hidden" name="id" th:value="${job.getId()}" ng-model="jobData.id" init-from-form="" />
+                </div>
+                <div class="form-group">
+                    <label for="name">Username</label>
+                    <input type="text" class="form-control" name="username" th:value="${job.getUsername()}" ng-model="jobData.username" init-from-form=""/>
+                </div>
+                <div class="form-group">
+                    <label for="placeFromSun">Status</label>
+                    <input type="text" class="form-control" name="status" th:value="${job.getStatus()}" ng-model="jobData.status" init-from-form=""/>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
