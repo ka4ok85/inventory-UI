@@ -2,18 +2,38 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <a ng-click="listView()">All Restatement Jobs</a>
-            <h2>Planet View</h2>
+            <h2>Restatement Job View</h2>
             <form ng-submit="processUpdateForm()">
                 <div class="form-group">
                     <input type="hidden" name="id" th:value="${job.getId()}" ng-model="jobData.id" init-from-form="" />
                 </div>
                 <div class="form-group">
+                    <label for="name">Job ID</label>
+                    <input disabled="disabled" type="text" class="form-control" name="id" th:value="${job.getId()}" ng-model="jobData.id" init-from-form=""/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Store Name</label>
+                    <input disabled="disabled" type="text" class="form-control" name="storename" th:value="${job.getStoreName()}" ng-model="jobData.storeName" init-from-form=""/>
+                </div>
+                <div class="form-group">
                     <label for="name">Username</label>
-                    <input type="text" class="form-control" name="username" th:value="${job.getUsername()}" ng-model="jobData.username" init-from-form=""/>
+                    <input disabled="disabled" type="text" class="form-control" name="username" th:value="${job.getUsername()}" ng-model="jobData.username" init-from-form=""/>
                 </div>
                 <div class="form-group">
                     <label for="placeFromSun">Status</label>
-                    <input type="text" class="form-control" name="status" th:value="${job.getStatus()}" ng-model="jobData.status" init-from-form=""/>
+                    <input disabled="disabled" type="text" class="form-control" name="status" th:value="${job.getStatus()}" ng-model="jobData.status" init-from-form=""/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Expected Quantity</label>
+                    <input disabled="disabled" type="text" class="form-control" name="expectedQuantity" th:value="${job.getExpectedQuantity()}" ng-model="jobData.expectedQuantity" init-from-form=""/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Store Location ID</label>
+                    <input disabled="disabled" type="text" class="form-control" name="storelocation" th:value="${job.getStorelocation()}" ng-model="jobData.storelocation" init-from-form=""/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Product ID</label>
+                    <input disabled="disabled" type="text" class="form-control" name="product" th:value="${job.getProduct()}" ng-model="jobData.product" init-from-form=""/>
                 </div>
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
