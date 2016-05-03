@@ -3,106 +3,153 @@ package restmodels;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Restatementjob {
 
 
-	@JsonProperty
-	private String id;
+    @JsonProperty
+    private String id;
 
-	@JsonProperty
-	private String product;
+    @JsonProperty
+    private String productName;
 
-	@JsonProperty
-	private String storeName;
+    @JsonProperty
+    private String storeName;
 
-	@JsonProperty
-	private String storeId;
+    @JsonProperty
+    private String storeId;
 
-	@JsonProperty
-	private String storelocation;
+    @JsonProperty
+    private String storelocation;
+    
+    @JsonProperty
+    private String storelocationShelf;
+    
+    @JsonProperty
+    private String storelocationSlot;
 
-	@JsonProperty
-	private String expectedQuantity;
+    @JsonProperty
+    private String expectedQuantity;
 
-	@JsonProperty
-	private String status;
+    @JsonProperty
+    private String status;
 
-	@JsonProperty
-	private String username;
+    @JsonProperty
+    private String usernameLogin;
+    
+    @JsonProperty
+    private String dateAdded;
 
-	public String getId() {
-		return id;
-	}
+    @JsonProperty
+    private String dateProcessed;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getProduct() {
-		return product;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setProduct(String product) {
-		this.product = product;
-	}
+    public String getProductName() {
+        return productName;
+    }
 
-	public String getStoreId() {
-		return storeId;
-	}
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-	public void setStoreId(String storeId) {
-		this.storeId = storeId;
-	}
+    public String getStoreName() {
+        return storeName;
+    }
 
-	public String getStoreName() {
-		return storeName;
-	}
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
 
-	public void setStoreName(String storeName) {
-		this.storeName = storeName;
-	}
+    public String getStoreId() {
+        return storeId;
+    }
 
-	public String getStorelocation() {
-		return storelocation;
-	}
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
 
-	public void setStorelocation(String storelocation) {
-		this.storelocation = storelocation;
-	}
+    public String getStorelocation() {
+        return storelocation;
+    }
 
-	public String getExpectedQuantity() {
-		return expectedQuantity;
-	}
+    public void setStorelocation(String storelocation) {
+        this.storelocation = storelocation;
+    }
 
-	public void setExpectedQuantity(String expectedQuantity) {
-		this.expectedQuantity = expectedQuantity;
-	}
+    public String getStorelocationShelf() {
+        return storelocationShelf;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setStorelocationShelf(String storelocationShelf) {
+        this.storelocationShelf = storelocationShelf;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStorelocationSlot() {
+        return storelocationSlot;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setStorelocationSlot(String storelocationSlot) {
+        this.storelocationSlot = storelocationSlot;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getExpectedQuantity() {
+        return expectedQuantity;
+    }
 
-	@Override
-	public String toString() {
-		return "Restatementjob [id=" + id + ", product=" + product + ", storeId=" + storeId + ", storeName=" + storeName + ", storelocation="
-				+ storelocation + ", expectedQuantity=" + expectedQuantity + ", status=" + status + ", username="
-				+ username + "]";
-	}
+    public void setExpectedQuantity(String expectedQuantity) {
+        this.expectedQuantity = expectedQuantity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getUsernameLogin() {
+        return usernameLogin;
+    }
+
+    public void setUsernameLogin(String usernameLogin) {
+        this.usernameLogin = usernameLogin;
+    }
+
+    public String getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(String dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public String getDateProcessed() {
+        return dateProcessed;
+    }
+
+    public void setDateProcessed(String dateProcessed) {
+        this.dateProcessed = dateProcessed;
+    }
+
+    @Override
+    public String toString() {
+        return "Restatementjob [id=" + id + ", productName=" + productName + ", storeName=" + storeName + ", storeId="
+                + storeId + ", storelocation=" + storelocation + ", storelocationShelf=" + storelocationShelf
+                + ", storelocationSlot=" + storelocationSlot + ", expectedQuantity=" + expectedQuantity + ", status="
+                + status + ", usernameLogin=" + usernameLogin + ", dateAdded=" + dateAdded + ", dateProcessed="
+                + dateProcessed + "]";
+    }
 
 
 }

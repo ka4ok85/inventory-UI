@@ -1,16 +1,17 @@
 <div class="container">
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-9 col-md-offset-3">
             <h2>Restatement Jobs</h2>
-            <a ng-click="addJob()">Add Restatement Job</a>
+            <a ng-click="addRestatementJob()">Add Restatement Job</a>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Store</th>
+                        <th>Date Assigned</th>
+                        <th>Product</th>
                         <th>Expected Quantity</th>
-                        <th>User</th>
                         <th>Status</th>
+                        <th>Date Processed</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -18,10 +19,11 @@
                 <tbody>
                     <tr th:each="job : ${jobs}">
                         <td th:text="${job.getId()}" />
-                        <td th:text="${job.getStoreName()}" />
+                        <td th:text="${job.getDateAdded()}" />
+                        <td th:text="${job.getProductName()}" />
                         <td th:text="${job.getExpectedQuantity()}" />
-                        <td th:text="${job.getUsername()}" />
                         <td th:text="${job.getStatus()}" />
+                        <td th:text="${job.getDateProcessed()}" />
                         <td>
                             <a th:attr="ng-click='viewJob(\''+${job.getId()} + '\')'">View</a>
                         </td>

@@ -31,8 +31,8 @@ app.config(function($routeProvider){
             templateUrl: function(params){ return '/ui/restatement_job/'+params.restatement_job+'?'+dummyParam(); },
             controller:  'ReadCtrl'
         })
-        .when('/addplanet/:dval?', {
-            templateUrl: function(params){ return '/ui/addplanet?'+dummyParam()},
+        .when('/add_restatement_job/:dval?', {
+            templateUrl: function(params){ return '/ui/add_restatement_job?'+dummyParam()},
             controller: 'NewCtrl'
         })
 });
@@ -51,8 +51,8 @@ app.controller('ListCtrl', function($scope, $http, $location) {
             });
     }
 
-    $scope.addJob = function(){
-        $location.path("/addjob/"+dValue());
+    $scope.addRestatementJob = function(){
+        $location.path("/add_restatement_job/"+dValue());
     }
 
 });

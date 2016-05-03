@@ -43,6 +43,7 @@ public class WelcomeController {
         return "index";
     }
 
+/*
     @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
     public String restatementjobsList(Model model) {
         RestTemplate restTemplate = new RestTemplate();
@@ -68,10 +69,38 @@ public class WelcomeController {
 
         return "restatementjoblist";
     }
+*/
 
+    @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
+    public String restatementjobsList(Model model) {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.setObjectMapper(new ObjectMapper());
+                jsonConverter.setSupportedMediaTypes(
+                    supportedMediaTypes
+                );
+            }
+        }
+
+        String hardcodedUser = "1";
+        String hardcodedStore = "1";
+        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
+        Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
+        model.addAttribute("jobs", body);
+
+        return "restatementjoblist";
+    }
 
     @RequestMapping(value = "/ui/restatement_job/{id}", method = RequestMethod.GET, produces = "application/json")
-    public String readPlanet(@PathVariable("id") Long id, Model model)
+    public String readRestatementJob(@PathVariable("id") Long id, Model model)
     {
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
@@ -95,6 +124,11 @@ public class WelcomeController {
         model.addAttribute("job", body);
 
         return "viewjob";
+    }
 
+    @RequestMapping("/ui/add_restatement_job")
+    public String addRestatementJob()
+    {
+        return "addrestatementjob";
     }
 }
