@@ -1,1 +1,28 @@
-add
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <a ng-click="listView()">All Restatement Jobs</a>
+            <h2>Add Restatement Job</h2>
+            <form ng-submit="processNewJob()">
+                <div class="form-group">
+                    <input type="hidden" name="id" ng-model="jobData.id" />
+                </div>
+                <div class="form-group">
+                    <label for="name">Expected Quantity</label>
+                    <input type="text" class="form-control" name="name" ng-model="jobData.expected_quantity" />
+                </div>
+<!--
+                <div class="form-group">
+                    <label for="placeFromSun">Place From Sun</label>
+                    <input type="text" class="form-control" name="placeFromSun" ng-model="planetData.placeFromSun" />
+                </div>
+                <div class="form-group">
+                    <label for="mass">Earth Masses</label>
+                    <input type="text" class="form-control" name="mass" ng-model="planetData.mass" />
+                </div>
+-->
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

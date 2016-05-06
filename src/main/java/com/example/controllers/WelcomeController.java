@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import restmodels.Restatementjob;
 import restmodels.Restatementjobs;
+import restmodels.UserShort;
 
 import com.example.InventoryUiApplication;
 
@@ -127,8 +128,32 @@ public class WelcomeController {
     }
 
     @RequestMapping("/ui/add_restatement_job")
-    public String addRestatementJob()
+    public String addRestatementJob(Model model)
     {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.setObjectMapper(new ObjectMapper());
+                jsonConverter.setSupportedMediaTypes(
+                    supportedMediaTypes
+                );
+            }
+        }
+
+        String hardcodedStore = "1";
+        String url = "http://localhost:8080/api/getusers/" + hardcodedStore + "/active";
+        UserShort[] body  = restTemplate.getForObject(url, UserShort[].class);
+        model.addAttribute("jobs", body);
+
         return "addrestatementjob";
     }
+
+
 }

@@ -74,18 +74,21 @@ app.controller('ReadCtrl', function($scope, $http, $location, Restangular) {
 });
 
 app.controller('NewCtrl', function($scope, $http, $location, Restangular){
-    $scope.planetData = {};
+    $scope.jobData = {};
 
     $scope.listView = function(){
         $location.path("/");
     }
-
-    $scope.processNewPlanet = function(){
-        var planets = Restangular.all('planets');
-        planets.post($scope.planetData).then(function(){
+/*
+$scope.user = {email :"", password: "", confpass: ""};
+Restangular.all('data.json/:user').post("users", $scope.user); 
+ */
+    $scope.processNewJob = function(){
+        var jobs = Restangular.all('ui/add_restatement_job_process');
+        jobs.post($scope.jobData).then(function(){
             $location.path("/");
         }, function() {
-            console.log('Error saving new planet.');
+            console.log('Error saving new restatement job.');
         });
     }
 });

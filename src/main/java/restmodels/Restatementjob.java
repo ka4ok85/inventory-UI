@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Restatementjob {
 
-
     @JsonProperty
     private String id;
 
