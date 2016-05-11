@@ -44,34 +44,6 @@ public class WelcomeController {
         return "index";
     }
 
-/*
-    @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
-    public String restatementjobsList(Model model) {
-        RestTemplate restTemplate = new RestTemplate();
-        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-
-        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
-                jsonConverter.setObjectMapper(new ObjectMapper());
-                jsonConverter.setSupportedMediaTypes(
-                    supportedMediaTypes
-                );
-            }
-        }
-
-        String url = "http://localhost:8080/api/getAllRestatementJobs";
-        Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
-        model.addAttribute("jobs", body);
-
-        return "restatementjoblist";
-    }
-*/
-
     @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
     public String restatementjobsList(Model model) {
         RestTemplate restTemplate = new RestTemplate();
@@ -120,6 +92,7 @@ public class WelcomeController {
             }
         }
 
+        String hardcodedStore = "1";
         String url = "http://localhost:8080/api/getRestatementJob/" + id;
         Restatementjob body  = restTemplate.getForObject(url, Restatementjob.class);
         model.addAttribute("job", body);
@@ -152,6 +125,10 @@ public class WelcomeController {
         UserShort[] body  = restTemplate.getForObject(url, UserShort[].class);
         model.addAttribute("jobs", body);
 
+        url = "http://localhost:8080/api/getusers/" + hardcodedStore + "/active";
+        UserShort[] usersList  = restTemplate.getForObject(url, UserShort[].class);
+        model.addAttribute("users", usersList);
+        
         return "addrestatementjob";
     }
 

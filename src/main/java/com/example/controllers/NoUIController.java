@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,16 +30,12 @@ import restmodels.Restatementjob;
 
 import com.example.exception.ResourceNotFoundException;
 
+
 @RestController
 public class NoUIController {
 
-    @RequestMapping(value="/ui/add_restatement_job_process", method=RequestMethod.POST)
-    public void addRestatementJobProcess(Model model) {
-        System.out.println("hit add");
-        //throw new ResourceNotFoundException();
-
-//return true;
-
+    @RequestMapping(value="/ui/add_restatement_job_process", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public void addRestatementJobProcess(@RequestBody Restatementjob restatementjob, Model model) {
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
 
@@ -55,28 +52,18 @@ public class NoUIController {
                 );
             }
         }
-
-        Restatementjob restatementjob = new Restatementjob();
-        restatementjob.setExpectedQuantity("2");
-        //String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
+        
+        restatementjob.setProductId("1");
+        restatementjob.setStoreId("1");
+        restatementjob.setStorelocation("1");
+        restatementjob.setUserId("1");
+        
         String url = "http://localhost:8080/api/addRestatementJob/";
         try {
         	Restatementjob restatementjobAdded = restTemplate.postForObject(url, restatementjob, Restatementjob.class);			
 		} catch (Exception e) {
 			throw new ResourceNotFoundException();
 		}
-        
-
-        
-        String hardcodedUser = "1";
-        String hardcodedStore = "1";
-        //String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
-        //Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
-        //model.addAttribute("jobs", body);
-
-        //return "restatementjoblist";
-
-    	//return "wqq";
     }
 	
 }

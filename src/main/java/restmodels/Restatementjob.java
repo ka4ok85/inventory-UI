@@ -13,6 +13,9 @@ public class Restatementjob {
     private String id;
 
     @JsonProperty
+    private String productId;
+
+    @JsonProperty
     private String productName;
 
     @JsonProperty
@@ -22,7 +25,7 @@ public class Restatementjob {
     private String storeId;
 
     @JsonProperty
-    private String storelocation;
+    private String storelocationId;
     
     @JsonProperty
     private String storelocationShelf;
@@ -37,8 +40,11 @@ public class Restatementjob {
     private String status;
 
     @JsonProperty
-    private String usernameLogin;
-    
+    private String userLogin;
+
+    @JsonProperty
+    private String userId;
+
     @JsonProperty
     private String dateAdded;
 
@@ -53,7 +59,19 @@ public class Restatementjob {
         this.id = id;
     }
 
-    public String getProductName() {
+    public String getProductId() {
+		return productId;
+	}
+
+	public void setProductId(String productId) {
+		this.productId = productId;
+	}
+
+	public void setStorelocationId(String storelocationId) {
+		this.storelocationId = storelocationId;
+	}
+
+	public String getProductName() {
         return productName;
     }
 
@@ -77,12 +95,12 @@ public class Restatementjob {
         this.storeId = storeId;
     }
 
-    public String getStorelocation() {
-        return storelocation;
+    public String getStorelocationId() {
+        return storelocationId;
     }
 
-    public void setStorelocation(String storelocation) {
-        this.storelocation = storelocation;
+    public void setStorelocation(String storelocationId) {
+        this.storelocationId = storelocationId;
     }
 
     public String getStorelocationShelf() {
@@ -117,15 +135,23 @@ public class Restatementjob {
         this.status = status;
     }
 
-    public String getUsernameLogin() {
-        return usernameLogin;
+    public String getUserLogin() {
+        return userLogin;
     }
 
-    public void setUsernameLogin(String usernameLogin) {
-        this.usernameLogin = usernameLogin;
+    public void setUserLogin(String userLogin) {
+        this.userLogin = userLogin;
     }
 
-    public String getDateAdded() {
+    public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getDateAdded() {
         return dateAdded;
     }
 
@@ -141,14 +167,15 @@ public class Restatementjob {
         this.dateProcessed = dateProcessed;
     }
 
-    @Override
-    public String toString() {
-        return "Restatementjob [id=" + id + ", productName=" + productName + ", storeName=" + storeName + ", storeId="
-                + storeId + ", storelocation=" + storelocation + ", storelocationShelf=" + storelocationShelf
-                + ", storelocationSlot=" + storelocationSlot + ", expectedQuantity=" + expectedQuantity + ", status="
-                + status + ", usernameLogin=" + usernameLogin + ", dateAdded=" + dateAdded + ", dateProcessed="
-                + dateProcessed + "]";
-    }
+	@Override
+	public String toString() {
+		return "Restatementjob [id=" + id + ", productId=" + productId + ", productName=" + productName + ", storeName="
+				+ storeName + ", storeId=" + storeId + ", storelocationId=" + storelocationId + ", storelocationShelf="
+				+ storelocationShelf + ", storelocationSlot=" + storelocationSlot + ", expectedQuantity="
+				+ expectedQuantity + ", status=" + status + ", userLogin=" + userLogin + ", userId=" + userId
+				+ ", dateAdded=" + dateAdded + ", dateProcessed=" + dateProcessed + "]";
+	}
+
 
 
 }

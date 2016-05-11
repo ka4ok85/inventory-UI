@@ -9,18 +9,16 @@
                 </div>
                 <div class="form-group">
                     <label for="name">Expected Quantity</label>
-                    <input type="text" class="form-control" name="name" ng-model="jobData.expected_quantity" />
+                    <input type="text" class="form-control" name="name" ng-model="jobData.expectedQuantity" />
                 </div>
-<!--
-                <div class="form-group">
-                    <label for="placeFromSun">Place From Sun</label>
-                    <input type="text" class="form-control" name="placeFromSun" ng-model="planetData.placeFromSun" />
-                </div>
-                <div class="form-group">
-                    <label for="mass">Earth Masses</label>
-                    <input type="text" class="form-control" name="mass" ng-model="planetData.mass" />
-                </div>
--->
+                <div>
+                    <label for="user">User</label>
+					<select id="user" class="form-control" ng-model="jobData.userId">
+					  <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getLogin()}" />
+					</select>
+				</div>
+				<div></div>                
+
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
         </div>
