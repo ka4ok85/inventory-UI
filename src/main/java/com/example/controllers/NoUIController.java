@@ -26,7 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import restmodels.Login;
+import restmodels.LoginBackend;
 import restmodels.Restatementjob;
+import restmodels.Token;
 
 import com.example.exception.ResourceNotFoundException;
 
@@ -65,5 +68,43 @@ public class NoUIController {
 			throw new ResourceNotFoundException();
 		}
     }
-	
+    
+    @RequestMapping(value="/ui/process_login", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public Token loginProcess(@RequestBody Login login, Model model) {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.setObjectMapper(new ObjectMapper());
+                jsonConverter.setSupportedMediaTypes(
+                    supportedMediaTypes
+                );
+            }
+        }
+
+        System.out.println(login);
+        
+        LoginBackend loginBackend = new LoginBackend();
+        loginBackend.setUsername(login.getLogin());
+        loginBackend.setPassword(login.getPassword());
+        System.out.println(loginBackend);
+     
+        String url = "http://localhost:8080/auth";
+        Token token;
+        try {
+        	token = restTemplate.postForObject(url, loginBackend, Token.class);
+        	System.out.println(token.getToken());
+		} catch (Exception e) {
+			throw new ResourceNotFoundException();
+		}
+
+        return token;
+    }
+    
 }

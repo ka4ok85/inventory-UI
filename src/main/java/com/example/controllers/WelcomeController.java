@@ -43,6 +43,12 @@ public class WelcomeController {
 
         return "index";
     }
+    
+    @RequestMapping(value="/ui/login", method=RequestMethod.GET)
+    public String login(Model model) {
+
+        return "login";
+    }
 
     @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
     public String restatementjobsList(Model model) {
@@ -65,9 +71,9 @@ public class WelcomeController {
 
         String hardcodedUser = "1";
         String hardcodedStore = "1";
-        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
-        Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
-        model.addAttribute("jobs", body);
+        //String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
+        //Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
+        //model.addAttribute("jobs", body);
 
         return "restatementjoblist";
     }
