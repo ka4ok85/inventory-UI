@@ -105,6 +105,16 @@ app.controller( 'AppCtrl', function AppCtrl ($scope, $location ) {
 app.controller('LoginCtrl', function($scope, $http, $location, store, $state, Restangular){
 	  console.log('login controller');
 	$http.defaults.headers.post["Content-Type"] = "application/json";
+
+    $scope.selectedStore = null;
+    $scope.stores = [];
+    $http({
+    	method: 'GET',
+        url: '/store_list'
+    }).success(function (result) {
+        $scope.stores = result;
+    });
+    
     $scope.processLogin = function(){
         var jobs = Restangular.all('ui/process_login');
         console.log($scope.auth.login);

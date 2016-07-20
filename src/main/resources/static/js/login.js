@@ -26,6 +26,8 @@ app.controller('LoginCtrl', function($scope, $http, $location, Restangular){
             console.log('Error during login.');
         });
     }
+    
+
 });
 
 /*

@@ -2,11 +2,17 @@ package com.example.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -51,7 +57,12 @@ public class WelcomeController {
     }
 
     @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
-    public String restatementjobsList(Model model) {
+    public String restatementjobsList(ServletRequest request, Model model) {
+    	
+    	
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String authToken = httpRequest.getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
 
@@ -69,11 +80,18 @@ public class WelcomeController {
             }
         }
 
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authToken);
+        HttpEntity<?> httpEntity = new HttpEntity<Object>(requestHeaders);
+        
         String hardcodedUser = "1";
         String hardcodedStore = "1";
-        //String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
+        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
         //Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
-        //model.addAttribute("jobs", body);
+        ResponseEntity<Restatementjob[]> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Restatementjob[].class);
+        
+        model.addAttribute("jobs", body.getBody());
 
         return "restatementjoblist";
     }

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import restmodels.Login;
 import restmodels.LoginBackend;
 import restmodels.Restatementjob;
+import restmodels.StoreShort;
 import restmodels.Token;
 
 import com.example.exception.ResourceNotFoundException;
@@ -93,12 +94,15 @@ public class NoUIController {
         LoginBackend loginBackend = new LoginBackend();
         loginBackend.setUsername(login.getLogin());
         loginBackend.setPassword(login.getPassword());
+        loginBackend.setStoreId(login.getStore());
         System.out.println(loginBackend);
      
         String url = "http://localhost:8080/auth";
         Token token;
         try {
         	token = restTemplate.postForObject(url, loginBackend, Token.class);
+
+        	//token = restTemplate.getForObject(url, Token.class, loginBackend);
         	System.out.println(token.getToken());
 		} catch (Exception e) {
 			throw new ResourceNotFoundException();
@@ -107,4 +111,33 @@ public class NoUIController {
         return token;
     }
     
+    
+    
+    @RequestMapping(value="/store_list", method=RequestMethod.GET)
+    public StoreShort[] shoreStoreList(Model model) {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
+
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.setObjectMapper(new ObjectMapper());
+                jsonConverter.setSupportedMediaTypes(
+                    supportedMediaTypes
+                );
+            }
+        }
+
+
+        String url = "http://localhost:8080/api/getstores/short";
+        StoreShort[] body  = restTemplate.getForObject(url, StoreShort[].class);
+        System.out.println(body);
+        //model.addAttribute("jobs", body);
+
+        return body;
+    }
 }

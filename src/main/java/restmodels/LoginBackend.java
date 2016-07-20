@@ -13,6 +13,9 @@ public class LoginBackend {
     
     @JsonProperty
     private String password;
+    
+    @JsonProperty
+    private String storeId;
 
 	public String getUsername() {
 		return username;
@@ -30,10 +33,19 @@ public class LoginBackend {
 		this.password = password;
 	}
 
+	public String getStoreId() {
+		return storeId;
+	}
+
+	public void setStoreId(String storeId) {
+		this.storeId = storeId;
+	}
+
 	@Override
 	public String toString() {
-		return "LoginBackend [username=" + username + ", password=" + password + "]";
+		return "LoginBackend [username=" + username + ", password=" + password + ", storeId=" + storeId + "]";
 	}
+
     
 
 }
