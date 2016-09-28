@@ -3,23 +3,51 @@
         <div class="col-md-6 col-md-offset-3">
             <a ng-click="listView()">All Restatement Jobs</a>
             <h2>Add Restatement Job</h2>
-            <form ng-submit="processNewJob()">
+            <div id="errors" style="display: block;"></div>
+            <form ng-submit="processNewJob()" name="newJobForm" novalidate="novalidate">
                 <div class="form-group">
                     <input type="hidden" name="id" ng-model="jobData.id" />
                 </div>
-                <div class="form-group">
-                    <label for="name">Expected Quantity</label>
-                    <input type="text" class="form-control" name="name" ng-model="jobData.expectedQuantity" />
+                <div class="form-group" ng-class="{'has-error': newJobForm.quantity.$dirty &amp;&amp; newJobForm.quantity.$error.required}">
+                    <label for="quantity">Expected Quantity</label>
+                    <input type="text" class="form-control" name="quantity" ng-model="jobData.expectedQuantity" required="required" ng-pattern="/^[0-9]{1,7}$/" />
+                    <span class="help-block" ng-show="newJobForm.quantity.$dirty &amp;&amp; newJobForm.quantity.$error.required">
+    					Expected Quantity field is required.
+					</span>
+                    <span class="help-block" ng-show="newJobForm.quantity.$dirty &amp;&amp; newJobForm.quantity.$error.pattern">
+    					Expected Quantity must be a number.
+					</span>					
                 </div>
-                <div>
+                <div class="form-group" ng-class="{'has-error': newJobForm.user.$dirty &amp;&amp; newJobForm.user.$error.required}">
                     <label for="user">User</label>
-					<select id="user" class="form-control" ng-model="jobData.userId">
+					<select id="user" name="user" class="form-control" ng-model="jobData.userId" required="required">
 					  <option th:each="user : ${users}" th:value="${user.getId()}" th:text="${user.getLogin()}" />
 					</select>
+                    <span class="help-block" ng-show="newJobForm.user.$dirty &amp;&amp; newJobForm.user.$error.required">
+    					User field is required.
+					</span>					
 				</div>
-				<div></div>                
+                <div class="form-group" ng-class="{'has-error': newJobForm.product.$dirty &amp;&amp; newJobForm.product.$error.required}">
+                    <label for="product">Product</label>
+					<select id="product" name="product" class="form-control" ng-model="jobData.productId" required="required">
+					  <option th:each="product : ${products}" th:value="${product.getId()}" th:text="${product.getName()}" />
+					</select>
+                    <span class="help-block" ng-show="newJobForm.product.$dirty &amp;&amp; newJobForm.product.$error.required">
+    					Product field is required.
+					</span>					
+				</div>
+                <div class="form-group" ng-class="{'has-error': newJobForm.storelocation.$dirty &amp;&amp; newJobForm.storelocation.$error.required}">
+                    <label for="storelocation">Shelf/Slot</label>
+					<select id="storelocation" name="storelocation" class="form-control" ng-model="jobData.storelocationId" required="required">
+					  <option th:each="storelocation : ${storelocations}" th:value="${storelocation.getId()}" th:text="${'Shelf: ' + storelocation.getShelf() + ' / Slot: ' + storelocation.getSlot()}" />
+					</select>
+                    <span class="help-block" ng-show="newJobForm.storelocation.$dirty &amp;&amp; newJobForm.storelocation.$error.required">
+    					Shelf/Slot field is required.
+					</span>					
+				</div>
+				<div>&nbsp;</div>                
 
-                <button type="submit" class="btn btn-default">Submit</button>
+                <button type="submit" class="btn btn-default" ng-disabled="newJobForm.$invalid" >Add Job</button>
             </form>
         </div>
     </div>

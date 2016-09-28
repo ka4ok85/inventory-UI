@@ -27,8 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import restmodels.ProductShort;
 import restmodels.Restatementjob;
 import restmodels.Restatementjobs;
+import restmodels.Storelocation;
 import restmodels.UserShort;
 
 import com.example.InventoryUiApplication;
@@ -40,57 +42,34 @@ public class WelcomeController {
 
     @RequestMapping(value="/welcome", method=RequestMethod.GET)
     public String welcome(Model model) {
-        log.debug("welcome");
         return "welcome";
     }
 
     @RequestMapping(value="/ui", method=RequestMethod.GET)
     public String home(Model model) {
-
         return "index";
     }
     
     @RequestMapping(value="/ui/login", method=RequestMethod.GET)
     public String login(Model model) {
-
         return "login";
     }
-
-    @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
-    public String restatementjobsList(ServletRequest request, Model model) {
-    	
-    	
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String authToken = httpRequest.getHeader("Authorization");
+    
+    @RequestMapping(value="/ui/restatement_jobs/{storeId}/{userId}", method=RequestMethod.GET)
+    public String restatementjobsList(@PathVariable("storeId") Long storeId, @PathVariable("userId") Long userId, ServletRequest request, Model model) {
+    	// get token from Request Header
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
     	System.out.println("UI Get Header: " + authToken);
+
+    	// attach token to API Request Header
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+
+        // call API
         RestTemplate restTemplate = new RestTemplate();
-        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-
-        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
-                jsonConverter.setObjectMapper(new ObjectMapper());
-                jsonConverter.setSupportedMediaTypes(
-                    supportedMediaTypes
-                );
-            }
-        }
-
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        requestHeaders.set("Authorization", authToken);
-        HttpEntity<?> httpEntity = new HttpEntity<Object>(requestHeaders);
-        
-        String hardcodedUser = "1";
-        String hardcodedStore = "1";
-        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + hardcodedStore + "/" + hardcodedUser;
-        //Restatementjob[] body  = restTemplate.getForObject(url, Restatementjob[].class);
+        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + storeId.toString() + "/" + userId.toString();
         ResponseEntity<Restatementjob[]> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Restatementjob[].class);
-        
+
+        // return results to the View
         model.addAttribute("jobs", body.getBody());
 
         return "restatementjoblist";
@@ -116,7 +95,6 @@ public class WelcomeController {
             }
         }
 
-        String hardcodedStore = "1";
         String url = "http://localhost:8080/api/getRestatementJob/" + id;
         Restatementjob body  = restTemplate.getForObject(url, Restatementjob.class);
         model.addAttribute("job", body);
@@ -124,35 +102,29 @@ public class WelcomeController {
         return "viewjob";
     }
 
-    @RequestMapping("/ui/add_restatement_job")
-    public String addRestatementJob(Model model)
+    @RequestMapping("/ui/add_restatement_job/{storeId}/{userId}")
+    public String addRestatementJob(@PathVariable("storeId") Long storeId, @PathVariable("userId") Long userId, ServletRequest request, Model model)
     {
-        RestTemplate restTemplate = new RestTemplate();
-        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-
-        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-        supportedMediaTypes.add(new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-        supportedMediaTypes.add(new MediaType("text", "html", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
-                jsonConverter.setObjectMapper(new ObjectMapper());
-                jsonConverter.setSupportedMediaTypes(
-                    supportedMediaTypes
-                );
-            }
-        }
-
-        String hardcodedStore = "1";
-        String url = "http://localhost:8080/api/getusers/" + hardcodedStore + "/active";
-        UserShort[] body  = restTemplate.getForObject(url, UserShort[].class);
-        model.addAttribute("jobs", body);
-
-        url = "http://localhost:8080/api/getusers/" + hardcodedStore + "/active";
-        UserShort[] usersList  = restTemplate.getForObject(url, UserShort[].class);
-        model.addAttribute("users", usersList);
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
+    	
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
         
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/getusers/" + storeId.toString() + "/active";
+        ResponseEntity<UserShort[]> bodyUsers  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, UserShort[].class);
+        model.addAttribute("users", bodyUsers.getBody());
+        
+        restTemplate = new RestTemplate();
+        url = "http://localhost:8080/api/getproductsbystore/" + storeId.toString();
+        ResponseEntity<ProductShort[]> bodyProducts  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, ProductShort[].class);
+        model.addAttribute("products", bodyProducts.getBody());
+
+        restTemplate = new RestTemplate();
+        url = "http://localhost:8080/api/getstorelocationsbystore/" + storeId.toString();
+        ResponseEntity<Storelocation[]> bodyStorelocations  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Storelocation[].class);
+        model.addAttribute("storelocations", bodyStorelocations.getBody());
+
         return "addrestatementjob";
     }
 

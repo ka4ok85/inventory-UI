@@ -8,6 +8,7 @@ var dummyParam = function()
     return "_b="+dValue();
 }
 
+
 angular.module('initFromForm', [])
   .directive("initFromForm", function ($parse) {
     return {
@@ -31,67 +32,117 @@ var app = angular.module('inventoryApp', [
 );
 
 
-app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterceptorProvider, $httpProvider, $stateProvider) {
-	console.log('1');  
-	//$urlRouterProvider.otherwise('/ui/login');
-	  //$urlRouterProvider.otherwise('/ui/login?'+dummyParam());
+app.factory('loggedUserService', function($rootScope) {
+    var sharedService = {};
+    
+    sharedService.login = "";
+    sharedService.store = "";
+    sharedService.isLogged = "0";
 
-	  jwtInterceptorProvider.tokenGetter = function(store) {
-		  console.log('11');
-		  console.log(store.get('jwt'));
+    sharedService.prepForBroadcast = function(login, store) {
+        this.login = login;
+        this.store = store;
+        if (login != "" && store != "") {
+        	this.isLogged = "1";
+        } else {
+        	this.isLogged = "0";
+        }
+        
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
+});
+
+
+app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterceptorProvider, $httpProvider, $stateProvider) {
+      console.log('app config start');  
+
+      jwtInterceptorProvider.tokenGetter = function(store) {
+		console.log("stored token " + store.get('jwt'));
 	    return store.get('jwt');
 	  }
+
 	  $stateProvider.state('login', {
 		    url: '/login',
 		    controller: 'LoginCtrl',
 		    templateUrl: 'ui/login.html'
 	  });  
+
 	  $stateProvider.state('restatement_jobs', {
 		    url: '/ui/restatement_jobs',
 		    controller: 'ListCtrl',
-		    templateUrl: 'ui/restatement_jobs.html'
+		    //templateUrl: 'ui/restatement_jobs/:storeId/:userId.html',
+		    templateUrl:function ($stateParams){
+		        return 'ui/restatement_jobs/' + $stateParams.storeId + '/' + $stateParams.userId + '.html';
+		    },
+		    params: {
+		        'userId': null, 
+		        'storeId': null
+		    }
 	  });  
-	  /*
-        //.when('/:dval?',{
-            //templateUrl: function(params){ return '/ui/restatement_jobs?'+dummyParam()},
-            //controller:  'ListCtrl'
-        //})
-	   * 
-	  $routeProvider
-	  .when('/:dval?',{
-	        templateUrl: function(params){ return '/ui/login?'+dummyParam()},
-	        controller:  'LoginCtrl'
+
+	  $stateProvider.state('restatement_job_add', {
+		    url: '/ui/add_restatement_job',
+		    controller: 'AddCtrl',
+		    //templateUrl: 'ui/add_restatement_job.html',
+		    templateUrl:function ($stateParams){
+		        return 'ui/add_restatement_job/' + $stateParams.storeId + '/' + $stateParams.userId + '.html';
+		    },		    
+		    params: {
+		        'userId': null, 
+		        'storeId': null
+		    }
 	  });
-	  */
+
 	  $httpProvider.interceptors.push('jwtInterceptor');
 })
-app.run(function($rootScope, $state, store, jwtHelper) {
-	console.log('2');
-    if (!store.get('jwt') || jwtHelper.isTokenExpired(store.get('jwt'))) {
-  	  console.log('44');
 
+
+app.run(function($rootScope, $state, store, jwtHelper) {
+	console.log('app run start');
+    if (!store.get('jwt') || jwtHelper.isTokenExpired(store.get('jwt'))) {
+  	  console.log('jwt does not exist or expired');
+
+  	  // force login
       $state.go('login');
     } else {
-    	$state.go('restatement_jobs');
+      // redirect to dashboard
+      $state.go('restatement_jobs');
     }
 	
-  $rootScope.$on('$stateChangeStart', function(e, to) {
-	  console.log('22');
-    if (to.data && to.data.requiresLogin) {
-    	console.log('222');
-      if (!store.get('jwt') || jwtHelper.isTokenExpired(store.get('jwt'))) {
-    	  console.log('2222');
-        e.preventDefault();
-        $state.go('login');
-        
+    $rootScope.$on('$stateChangeStart', function(e, to) {
+	  console.log('stateChangeStart');
+      if (to.data && to.data.requiresLogin) {
+        console.log('to.data && to.data.requiresLogin - passed');
+        if (!store.get('jwt') || jwtHelper.isTokenExpired(store.get('jwt'))) {
+      	  console.log('stateChangeStart - force login');
+          e.preventDefault();
+          $state.go('login');
+        }
       }
-    }
-  });
+    });
 })
-app.controller( 'AppCtrl', function AppCtrl ($scope, $location ) {
-  console.log('3');
-//app.controller('LoginCtrl', function($scope, $http, $location, Restangular){
 
+app.controller( 'AppCtrl', function AppCtrl ($scope, $location, $state, store, loggedUserService ) {
+  console.log('3');
+
+  $scope.loggedUser = "";
+  $scope.currentStore = "";
+  $scope.isLogged = "0";
+  $scope.userRoles = null;
+ 
+
+  $scope.$on('handleBroadcast', function() {
+	  $scope.loggedUser = loggedUserService.login;
+      $scope.currentStore = loggedUserService.store;
+      $scope.isLogged = loggedUserService.isLogged;
+  }); 
+  
   $scope.$on('$routeChangeSuccess', function(e, nextRoute){
 	  console.log('33');
 	  console.log(nextRoute);
@@ -100,12 +151,23 @@ app.controller( 'AppCtrl', function AppCtrl ($scope, $location ) {
       //$scope.pageTitle = nextRoute.$$route.pageTitle + ' | ngEurope Sample' ;
     //}
   });
+  
+  $scope.logout = function() {
+  	console.log('log out.');
+  	store.remove('jwt');
+  	loggedUserService.prepForBroadcast("", "");
+  	$state.go('login');
+  	
+  	//redirect
+  };
 })
 
-app.controller('LoginCtrl', function($scope, $http, $location, store, $state, Restangular){
-	  console.log('login controller');
+app.controller('LoginCtrl', function($scope, $http, $location, store, $state, jwtHelper, Restangular, loggedUserService){
+    console.log('login controller start');
 	$http.defaults.headers.post["Content-Type"] = "application/json";
 
+	
+	// get data for Store dropdown 
     $scope.selectedStore = null;
     $scope.stores = [];
     $http({
@@ -114,37 +176,46 @@ app.controller('LoginCtrl', function($scope, $http, $location, store, $state, Re
     }).success(function (result) {
         $scope.stores = result;
     });
-    
+  
     $scope.processLogin = function(){
         var jobs = Restangular.all('ui/process_login');
-        console.log($scope.auth.login);
-        console.log($scope.auth.store);
         jobs.post($scope.auth).then(function(response){
-            store.set('jwt', response.token);
-            $state.go('restatement_jobs');
+        	console.log("token " + response.token);
+        	console.log("message " + response.message);
+        	if (angular.isUndefined(response.token)) {
+                console.log('Wrong credentials.');
+        	    $scope.errors = {};
+        	    var modelState = {password: response.message};
+        	    errorHelper.validateForms($scope.loginForm, $scope.errors, modelState);
+        	    
+        	} else {
+                console.log('Succeeded login attempt.');
+                store.set('jwt', response.token);
+                
+                var tokenPayload = jwtHelper.decodeToken(response.token);
+                console.log(tokenPayload);
+                console.log("Token Username:"+tokenPayload.sub);
+                console.log("Token User ID:"+tokenPayload.sub_id);
+                console.log("Token StoreId:"+tokenPayload.store);
+                
+                loggedUserService.prepForBroadcast(tokenPayload.sub, tokenPayload.store_name);
+                //$state.go('restatement_jobs');
+                $state.go('restatement_jobs', { 'userId':tokenPayload.sub_id, 'storeId':tokenPayload.store });
+                
+        	}
         }, function() {
-            console.log('Error during login.');
+            console.log('Backend error during login.');
         });
     }
     
-    
-    /*
-  $scope.login = function() {
-    $http({
-      url: 'http://localhost:3001/sessions/create',
-      method: 'POST',
-      data: $scope.user
-    }).then(function(response) {
-      store.set('jwt', response.data.id_token);
-      $state.go('home');
-    }, function(error) {
-      alert(error.data);
-    });
-  }
-     */
+
 });
 
-app.controller('ListCtrl', function($scope, $http, $location) {
+app.controller('ListCtrl', function($scope, $http, $location, $state, $stateParams) {
+    console.log('restatement job controller start');
+    console.log($stateParams.userId);
+    console.log($stateParams.storeId);
+    console.log('restatement job controller start');
     $http.defaults.headers.post["Content-Type"] = "application/json";
 
     $scope.viewJob = function(ident){
@@ -159,10 +230,39 @@ app.controller('ListCtrl', function($scope, $http, $location) {
     }
 
     $scope.addRestatementJob = function(){
-        $location.path("/add_restatement_job/"+dValue());
+        //$location.path("/add_restatement_job/"+dValue());
+    	console.log('addRestatementJob start');
+    	$state.go('restatement_job_add', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId });
     }
+    //$state.go('restatement_jobs', { 'userId':tokenPayload.sub_id, 'storeId':tokenPayload.store });
 
-});                     
+
+});      
+
+
+app.controller('AddCtrl', function($scope, $http, $location, $state, $stateParams, Restangular) {
+    console.log('add restatement job controller start');
+
+    $scope.listView = function() {
+        $state.go('restatement_jobs', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId });
+    } 
+    
+    $scope.jobData = {'storeId':$stateParams.storeId};
+    $http.defaults.headers.post["Content-Type"] = "application/json";
+
+    $scope.processNewJob = function(){
+        var jobs = Restangular.all('ui/add_restatement_job_process');
+        jobs.post($scope.jobData).then(function(){
+            $location.path("/");
+        }, function() {
+            console.log('Error saving new restatement job.');
+        });
+    }
+});      
+
+//
+
+//
           /*               
 .config( function myAppConfig ($urlRouterProvider, jwtInterceptorProvider, $httpProvider) {
   $urlRouterProvider.otherwise('/');

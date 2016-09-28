@@ -10,6 +10,9 @@ public class Token {
 
     @JsonProperty
     private String token;
+    
+    @JsonProperty("message")
+    private String errorMessage;    
 
 	public String getToken() {
 		return token;
@@ -19,10 +22,19 @@ public class Token {
 		this.token = token;
 	}
 
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
 	@Override
 	public String toString() {
-		return "Token [token=" + token + "]";
+		return "Token [token=" + token + ", errorMessage=" + errorMessage + "]";
 	}
+
 
 
     

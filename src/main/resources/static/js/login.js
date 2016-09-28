@@ -13,7 +13,9 @@ app.config(function($stateProvider) {
   });
 })
 
+/*
 
+//should be live
 app.controller('LoginCtrl', function($scope, $http, $location, Restangular){
     $http.defaults.headers.post["Content-Type"] = "application/json";
     $scope.processLogin = function(){
@@ -29,6 +31,11 @@ app.controller('LoginCtrl', function($scope, $http, $location, Restangular){
     
 
 });
+*/
+
+
+
+
 
 /*
 .controller( 'LoginCtrl', function LoginController( $scope, $http, store, $state) {
