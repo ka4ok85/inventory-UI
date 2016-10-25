@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import restmodels.Product;
 import restmodels.ProductShort;
 import restmodels.Restatementjob;
 import restmodels.Restatementjobs;
@@ -55,8 +56,8 @@ public class WelcomeController {
         return "login";
     }
     
-    @RequestMapping(value="/ui/restatement_jobs/{storeId}/{userId}", method=RequestMethod.GET)
-    public String restatementjobsList(@PathVariable("storeId") Long storeId, @PathVariable("userId") Long userId, ServletRequest request, Model model) {
+    @RequestMapping(value="/ui/restatement_jobs", method=RequestMethod.GET)
+    public String restatementjobsList(ServletRequest request, Model model) {
     	// get token from Request Header
         String authToken = ((HttpServletRequest) request).getHeader("Authorization");
     	System.out.println("UI Get Header: " + authToken);
@@ -66,7 +67,7 @@ public class WelcomeController {
 
         // call API
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser/" + storeId.toString() + "/" + userId.toString();
+        String url = "http://localhost:8080/api/getAllRestatementJobsForStoreAndUser";
         ResponseEntity<Restatementjob[]> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Restatementjob[].class);
 
         // return results to the View
@@ -75,9 +76,10 @@ public class WelcomeController {
         return "restatementjoblist";
     }
 
-    @RequestMapping(value = "/ui/restatement_job/{id}", method = RequestMethod.GET, produces = "application/json")
-    public String readRestatementJob(@PathVariable("id") Long id, Model model)
+    @RequestMapping(value = "/ui/view_restatement_job/{id}", method = RequestMethod.GET)
+    public String readRestatementJob(@PathVariable("id") Long id, ServletRequest request, Model model)
     {
+    	/*
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
 
@@ -98,12 +100,23 @@ public class WelcomeController {
         String url = "http://localhost:8080/api/getRestatementJob/" + id;
         Restatementjob body  = restTemplate.getForObject(url, Restatementjob.class);
         model.addAttribute("job", body);
-
+*/
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+     	System.out.println("UI Get Header : " + authToken);
+     	
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+         
+        RestTemplate restTemplate = new RestTemplate();
+        System.out.println("1");
+        String url = "http://localhost:8080/api/getRestatementJob/" + id;
+        ResponseEntity<Restatementjob> bodyJob  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Restatementjob.class);
+        System.out.println("2");
+        model.addAttribute("job", bodyJob.getBody());   	
         return "viewjob";
     }
 
-    @RequestMapping("/ui/add_restatement_job/{storeId}/{userId}")
-    public String addRestatementJob(@PathVariable("storeId") Long storeId, @PathVariable("userId") Long userId, ServletRequest request, Model model)
+    @RequestMapping("/ui/add_restatement_job")
+    public String addRestatementJob(ServletRequest request, Model model)
     {
         String authToken = ((HttpServletRequest) request).getHeader("Authorization");
     	System.out.println("UI Get Header: " + authToken);
@@ -111,22 +124,42 @@ public class WelcomeController {
         HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
         
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8080/api/getusers/" + storeId.toString() + "/active";
+        String url = "http://localhost:8080/api/getusers/active";
         ResponseEntity<UserShort[]> bodyUsers  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, UserShort[].class);
         model.addAttribute("users", bodyUsers.getBody());
         
         restTemplate = new RestTemplate();
-        url = "http://localhost:8080/api/getproductsbystore/" + storeId.toString();
+        url = "http://localhost:8080/api/getproductsbystore";
         ResponseEntity<ProductShort[]> bodyProducts  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, ProductShort[].class);
         model.addAttribute("products", bodyProducts.getBody());
 
         restTemplate = new RestTemplate();
-        url = "http://localhost:8080/api/getstorelocationsbystore/" + storeId.toString();
+        url = "http://localhost:8080/api/getstorelocationsbystore";
         ResponseEntity<Storelocation[]> bodyStorelocations  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Storelocation[].class);
         model.addAttribute("storelocations", bodyStorelocations.getBody());
 
         return "addrestatementjob";
     }
 
+/**************************************PRODUCTS**********************************/
+    
+    @RequestMapping(value="/ui/products", method=RequestMethod.GET)
+    public String productsList(ServletRequest request, Model model) {
+    	// get token from Request Header
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
 
+    	// attach token to API Request Header
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+
+        // call API
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/getproductsbystore";
+        ResponseEntity<Product[]> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Product[].class);
+
+        // return results to the View
+        model.addAttribute("products", body.getBody());
+
+        return "productlist";
+    }
 }

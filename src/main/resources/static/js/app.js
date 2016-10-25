@@ -22,10 +22,11 @@ angular.module('initFromForm', [])
 
 var app = angular.module('inventoryApp', [
                                           'ngRoute', 
+                                          'ngCacheBuster',
                                           'initFromForm', 
                                           'restangular',
                                           'ui.router',
-                                          //'inventory.login',
+                                          'inventory.product',
                                           'angular-jwt',
                                           'angular-storage'
                                           ]
@@ -59,8 +60,10 @@ app.factory('loggedUserService', function($rootScope) {
 });
 
 
-app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterceptorProvider, $httpProvider, $stateProvider) {
+app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterceptorProvider, $httpProvider, $stateProvider, httpRequestInterceptorCacheBusterProvider) {
       console.log('app config start');  
+
+      httpRequestInterceptorCacheBusterProvider.setMatchlist([/.*ui.*/],true);
 
       jwtInterceptorProvider.tokenGetter = function(store) {
 		console.log("stored token " + store.get('jwt'));
@@ -75,10 +78,10 @@ app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterce
 
 	  $stateProvider.state('restatement_jobs', {
 		    url: '/ui/restatement_jobs',
+		    cache: false,
 		    controller: 'ListCtrl',
-		    //templateUrl: 'ui/restatement_jobs/:storeId/:userId.html',
 		    templateUrl:function ($stateParams){
-		        return 'ui/restatement_jobs/' + $stateParams.storeId + '/' + $stateParams.userId + '.html';
+		        return 'ui/restatement_jobs' + '.html';
 		    },
 		    params: {
 		        'userId': null, 
@@ -91,11 +94,24 @@ app.config( function myAppConfig ($urlRouterProvider, $routeProvider, jwtInterce
 		    controller: 'AddCtrl',
 		    //templateUrl: 'ui/add_restatement_job.html',
 		    templateUrl:function ($stateParams){
-		        return 'ui/add_restatement_job/' + $stateParams.storeId + '/' + $stateParams.userId + '.html';
+		        return 'ui/add_restatement_job' + '.html';
+//		        return 'ui/add_restatement_job/' + $stateParams.storeId + '/' + $stateParams.userId + '.html';		        
 		    },		    
 		    params: {
 		        'userId': null, 
 		        'storeId': null
+		    }
+	  });
+
+	  $stateProvider.state('restatement_job_view', {
+		    url: '/ui/view_restatement_job',
+		    controller: 'ViewCtrl',
+		    //templateUrl: 'ui/view_restatement_job.html',
+		    templateUrl:function ($stateParams){
+		        return 'ui/view_restatement_job/' + $stateParams.jobId + '.html';
+		    },		    
+		    params: {
+		        'jobId': null
 		    }
 	  });
 
@@ -160,6 +176,32 @@ app.controller( 'AppCtrl', function AppCtrl ($scope, $location, $state, store, l
   	
   	//redirect
   };
+  
+  // Main menu links
+  $scope.callFunction = function (name){
+      if(angular.isFunction($scope[name])) {
+    	  $scope[name](); 
+      }
+  }
+  
+  $scope.navmenu = [];
+  var restatementJobs = {title: "Restatement Jobs", clickFunction: "restatementjobs"};
+  $scope.navmenu.push(restatementJobs);  
+  var products = {title: "Products", clickFunction: "products"};
+  $scope.navmenu.push(products);    
+
+  $scope.selectedIndex = 0;
+  $scope.itemClicked = function ($index) {
+    $scope.selectedIndex = $index;
+  }
+
+  $scope.restatementjobs = function() {
+	  	$state.go('restatement_jobs');
+  };
+  $scope.products = function() {
+	  	$state.go('products');
+  };
+	  
 })
 
 app.controller('LoginCtrl', function($scope, $http, $location, store, $state, jwtHelper, Restangular, loggedUserService){
@@ -215,11 +257,13 @@ app.controller('ListCtrl', function($scope, $http, $location, $state, $statePara
     console.log('restatement job controller start');
     console.log($stateParams.userId);
     console.log($stateParams.storeId);
+    
     console.log('restatement job controller start');
     $http.defaults.headers.post["Content-Type"] = "application/json";
 
     $scope.viewJob = function(ident){
-        $location.path("/restatement_job/"+ident);
+        //$location.path("/restatement_job/"+ident);
+        $state.go('restatement_job_view', { 'jobId':ident });
     }
 
     $scope.deleteJob = function(ident){
@@ -232,7 +276,8 @@ app.controller('ListCtrl', function($scope, $http, $location, $state, $statePara
     $scope.addRestatementJob = function(){
         //$location.path("/add_restatement_job/"+dValue());
     	console.log('addRestatementJob start');
-    	$state.go('restatement_job_add', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId });
+    	//$state.go('restatement_job_add', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId });
+    	$state.go('restatement_job_add');
     }
     //$state.go('restatement_jobs', { 'userId':tokenPayload.sub_id, 'storeId':tokenPayload.store });
 
@@ -247,18 +292,31 @@ app.controller('AddCtrl', function($scope, $http, $location, $state, $stateParam
         $state.go('restatement_jobs', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId });
     } 
     
-    $scope.jobData = {'storeId':$stateParams.storeId};
+    //$scope.jobData = {'storeId':$stateParams.storeId};
+    $scope.jobData = {};
     $http.defaults.headers.post["Content-Type"] = "application/json";
 
     $scope.processNewJob = function(){
         var jobs = Restangular.all('ui/add_restatement_job_process');
         jobs.post($scope.jobData).then(function(){
-            $location.path("/");
+            $state.go('restatement_jobs', { 'userId':$stateParams.userId, 'storeId':$stateParams.storeId }, {reload: true, inherit: false, notify: true});
         }, function() {
             console.log('Error saving new restatement job.');
         });
     }
 });      
+
+app.controller('ViewCtrl', function($scope, $http, $location, $state, $stateParams, Restangular) {
+    console.log('view  restatement job controller start');
+
+    $scope.listView = function() {
+        $state.go('restatement_jobs');
+    } 
+    
+
+});      
+
+
 
 //
 

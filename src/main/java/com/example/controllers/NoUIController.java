@@ -68,22 +68,7 @@ public class NoUIController {
 			throw new ResourceNotFoundException();
 		}
     }
-/*
-// set headers
-HttpHeaders headers = new HttpHeaders();
-headers.setContentType(MediaType.APPLICATION_JSON);
-HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-// send request and parse result
-ResponseEntity<String> loginResponse = restTemplate
-  .exchange(urlString, HttpMethod.POST, entity, String.class);
-if (loginResponse.getStatusCode() == HttpStatus.OK) {
-  JSONObject userJson = new JSONObject(loginResponse.getBody());
-} else if (loginResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-  // nono... bad credentials
-}
- * 
- */
     @RequestMapping(value="/ui/process_login", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
     public Token loginProcess(@RequestBody Login login, Model model) {
         RestTemplate restTemplate = new RestTemplate();
