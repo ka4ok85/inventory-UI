@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +31,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import restmodels.Login;
 import restmodels.LoginBackend;
+import restmodels.ProductLocationChange;
 import restmodels.Restatementjob;
 import restmodels.RestatementjobAdd;
 import restmodels.StoreShort;
@@ -47,23 +52,19 @@ import com.example.exception.ResourceNotFoundException;
 public class NoUIController {
 
     @RequestMapping(value="/ui/add_restatement_job_process", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    //public void addRestatementJobProcess(@RequestBody RestatementjobAdd restatementjobAdd, ServletRequest request, Model model) {
     public void addRestatementJobProcess(@RequestBody String restatementjobAdd, ServletRequest request, Model model) {
         String authToken = ((HttpServletRequest) request).getHeader("Authorization");
     	System.out.println("UI Get Header: " + authToken);
-        System.out.println(restatementjobAdd);      
+
         HttpEntity<String> httpEntity = HelperController.getPostHttpEntity(restatementjobAdd.toString(), authToken);
         
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8080/api/addRestatementJob/";
 
-
         try {
-        	//Restatementjob restatementjobAdded = restTemplate.postForObject(url, restatementjob, Restatementjob.class);
         	ResponseEntity<Restatementjob> body = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Restatementjob.class);
         	Restatementjob restatementjobAdded = body.getBody();
         	System.out.println(restatementjobAdded);
-        	// Restatementjob restatementjobAdded
 		} catch (Exception e) {
 			throw new ResourceNotFoundException();
 		}
@@ -137,12 +138,42 @@ public class NoUIController {
             }
         }
 
-
         String url = "http://localhost:8080/api/getstores/short";
         StoreShort[] body  = restTemplate.getForObject(url, StoreShort[].class);
         System.out.println(body);
         //model.addAttribute("jobs", body);
 
         return body;
+    }
+    
+    @RequestMapping(value="/ui/change_product_into_location_process", method=RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public Object changeProductIntoLocationProcess(@RequestBody ProductLocationChange productLocationChange, ServletRequest request, Model model) throws JsonProcessingException {
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
+
+    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    	String json = ow.writeValueAsString(productLocationChange);
+    	
+        HttpEntity<String> httpEntity = HelperController.getPostHttpEntity(json, authToken);
+  System.out.println(productLocationChange);      
+        RestTemplate restTemplate = new RestTemplate();
+        String url;
+        if (productLocationChange.getAction().equals("add")) {
+        	url = "http://localhost:8080/api/addProductToLocation";
+        } else if (productLocationChange.getAction().equals("remove")) {
+        	url = "http://localhost:8080/api/removeProductFromLocation";
+        } else {
+        	throw new ResourceNotFoundException();
+        }
+        
+        try {
+			ResponseEntity<Object> body = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+			Object result = body.getBody();
+
+			return ResponseEntity.ok(result);				
+		} catch (Exception e) {
+			throw new ResourceNotFoundException();
+		}
+
     }
 }

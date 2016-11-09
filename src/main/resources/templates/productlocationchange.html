@@ -1,0 +1,51 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 col-md-offset-3">
+            <a ng-click="listView()">Back to Products List</a> > <a th:attr="ng-click='viewProduct(\''+${product.getId()} + '\')'">Back to Product Details</a> 
+         
+			<div th:switch="${action}"> 
+	  			<h2 th:case="'add'"><span th:text="'Add Product `' + ${product.getName()} + '` to Shelf ' + ${location.getShelf()} + ' / Slot ' + ${location.getSlot()} " ></span></h2>
+	  		    <h2 th:case="'remove'"><span th:text="'Remove Product `' + ${product.getName()} + '` from Shelf ' + ${location.getShelf()} + ' / Slot ' + ${location.getSlot()} " ></span></h2>
+	  		    <div th:text="'Current Quantity: ' + ${total}"></div>
+			</div>
+            <br />
+            
+            <div id="errors" style="display: block;"></div>
+            <form ng-submit="processProductLocationChange()" name="productLocationChangeForm" novalidate="novalidate">
+                <div class="form-group" ng-class="{'has-error': (productLocationChangeForm.quantity.$dirty &amp;&amp; productLocationChangeForm.quantity.$error.required) || productLocationChangeForm.quantity.$error.server}">
+                    <label for="quantity">Quantity</label>
+                    <input type="text" class="form-control" name="quantity" ng-model="productLocationChangeData.quantity" required="required" ng-pattern="/^[0-9]{1,7}$/" server-error="server-error" />
+                    <span class="help-block" ng-show="productLocationChangeForm.quantity.$dirty &amp;&amp; productLocationChangeForm.quantity.$error.required">
+    					Quantity field is required.
+					</span>
+                    <span class="help-block" ng-show="productLocationChangeForm.quantity.$dirty &amp;&amp; productLocationChangeForm.quantity.$error.pattern">
+    					Quantity must be a number.
+					</span>
+					<span class="help-block" ng-show="productLocationChangeForm.quantity.$error.server">
+						{{errors.quantity}}
+					</span>					
+                </div>
+<!--  
+                <div class="form-group" ng-class="{'has-error': productLocationChangeForm.storelocation.$dirty &amp;&amp; productLocationChangeForm.storelocation.$error.required}">
+                    <label for="storelocation">Shelf/Slot</label>
+					<select id="storelocation" name="storelocation" class="form-control" ng-model="productLocationChangeData.storelocationId" required="required">
+					  <option th:each="storelocation : ${storelocations}" th:value="${storelocation.getId()}" th:text="${'Shelf: ' + storelocation.getShelf() + ' / Slot: ' + storelocation.getSlot()}" />
+					</select>
+                    <span class="help-block" ng-show="productLocationChangeForm.storelocation.$dirty &amp;&amp; productLocationChangeForm.storelocation.$error.required">
+    					Shelf/Slot field is required.
+					</span>					
+				</div>
+-->
+				<div>&nbsp;</div>                
+
+                <button type="submit" class="btn btn-default" ng-disabled="productLocationChangeForm.$invalid" th:switch="${action}">
+	  				<span th:case="'add'">Add</span>
+	  		        <span th:case="'remove'">Remove</span>
+                </button>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,49 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 col-md-offset-3">
+            <a ng-click="listView()">Back to Products List</a>
+            <h2 th:text="'Product `' + ${product.getName()} + '` Details'" ></h2>
+            <div class="form-group">
+                <div th:text="'Product ID: ' + ${product.getId()}"></div>
+            </div>
+            <div class="form-group">
+                <div th:text="'Product SKU: ' + ${product.getSku()}"></div>
+            </div>
+            <div class="form-group">
+                <div th:text="'Total Quantity: ' + ${total}"></div>
+            </div>
+			<div class="form-group">
+                <a th:attr="ng-click='addProductToNewLocation(\'' + ${product.getId()} + '\')'">Add to New Location</a>
+            </div>            
+            
+            <h3>Locations</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Shelf</th>
+                        <th>Slot</th>
+                        <th>Quantity</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="location : ${locations}">
+                        <td th:text="${location.getStorelocation().getId()}" />
+                        <td th:text="${location.getStorelocation().getShelf()}" />
+                        <td th:text="${location.getStorelocation().getSlot()}" />
+                        <td th:text="${location.getQuantity()}" />
+                        <td>
+                            <a th:attr="ng-click='addProduct(\''+${location.getStorelocation().getId()} + '\',\'' + ${product.getId()} + '\')'">Add</a>
+                        </td>
+                        <td>
+                            <a th:attr="ng-click='removeProduct(\''+${location.getStorelocation().getId()} + '\',\'' + ${product.getId()} + '\')'">Remove</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>            
+        </div>
+    </div>
+</div>
+

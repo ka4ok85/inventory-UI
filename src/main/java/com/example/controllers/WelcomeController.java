@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import restmodels.Product;
+import restmodels.ProductFullInStoreWrapper;
 import restmodels.ProductShort;
 import restmodels.Restatementjob;
 import restmodels.Restatementjobs;
@@ -162,4 +163,92 @@ public class WelcomeController {
 
         return "productlist";
     }
+    
+    @RequestMapping(value="/ui/view_product_in_store/{id}", method=RequestMethod.GET)
+    public String viewProductInStore(@PathVariable("id") Long id, ServletRequest request, Model model) {
+    	// get token from Request Header
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
+
+    	// attach token to API Request Header
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+
+        // call API
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/getProductDetails/" + id;
+        ResponseEntity<ProductFullInStoreWrapper> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, ProductFullInStoreWrapper.class);
+
+        // return results to the View
+        model.addAttribute("product", body.getBody().getProduct());
+        model.addAttribute("total", body.getBody().getTotalQuantity().toString());
+        model.addAttribute("locations", body.getBody().getStorelocationQuantityWrappers());
+
+        return "productdetails";
+    }
+
+    @RequestMapping(value="/ui/change_product_into_location/{locationId}/{productId}/{action}", method=RequestMethod.GET)
+    public String changeProductIntoLocation(@PathVariable("locationId") Long locationId, @PathVariable("productId") Long productId, @PathVariable("action") String action, ServletRequest request, Model model) {
+    	// get token from Request Header
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
+
+    	// attach token to API Request Header
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+
+        // call API
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/getProductDetails/" + productId;
+        ResponseEntity<ProductFullInStoreWrapper> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, ProductFullInStoreWrapper.class);
+
+        // return results to the View
+        model.addAttribute("product", body.getBody().getProduct());
+        model.addAttribute("total", body.getBody().getTotalQuantity().toString());
+        model.addAttribute("locations", body.getBody().getStorelocationQuantityWrappers());
+        model.addAttribute("action", action);
+
+        restTemplate = new RestTemplate();
+        url = "http://localhost:8080/api/getstorelocationsbystore";
+        ResponseEntity<Storelocation[]> bodyStorelocations  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Storelocation[].class);
+        model.addAttribute("storelocations", bodyStorelocations.getBody());
+        
+        Storelocation[] storelocations = bodyStorelocations.getBody();
+        // probably less expensive would be another call to backend
+        for (Storelocation storelocation : storelocations) {
+			if (storelocation.getId().equals(locationId.toString())) {
+				model.addAttribute("location", storelocation);
+				break;
+			}
+		}
+
+        return "productlocationchange";
+    }
+
+    @RequestMapping(value="/ui/change_product_into_new_location/{productId}/{action}", method=RequestMethod.GET)
+    public String changeProductIntoNewLocation(@PathVariable("productId") Long productId, @PathVariable("action") String action, ServletRequest request, Model model) {
+    	// get token from Request Header
+        String authToken = ((HttpServletRequest) request).getHeader("Authorization");
+    	System.out.println("UI Get Header: " + authToken);
+
+    	// attach token to API Request Header
+        HttpEntity<?> httpEntity = HelperController.getHttpEntity(authToken);    	
+
+        // call API
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/getProductDetails/" + productId;
+        ResponseEntity<ProductFullInStoreWrapper> body  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, ProductFullInStoreWrapper.class);
+
+        // return results to the View
+        model.addAttribute("product", body.getBody().getProduct());
+        model.addAttribute("total", body.getBody().getTotalQuantity().toString());
+        model.addAttribute("locations", body.getBody().getStorelocationQuantityWrappers());
+        model.addAttribute("action", action);
+
+        restTemplate = new RestTemplate();
+        url = "http://localhost:8080/api/getstorelocationsbystore";
+        ResponseEntity<Storelocation[]> bodyStorelocations  = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Storelocation[].class);
+        model.addAttribute("storelocations", bodyStorelocations.getBody());
+        
+        return "productnewlocationchange";
+    }    
+    
 }
